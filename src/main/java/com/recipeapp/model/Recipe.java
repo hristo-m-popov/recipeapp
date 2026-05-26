@@ -20,9 +20,9 @@ public class Recipe {
     @Column(nullable = false, length = 50)
     private String title;
 
-    @NotBlank
-    @Column(nullable = false, length = 50)
-    private String type;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     @Size(max = 500)
     @Column(length = 500)

@@ -1,5 +1,6 @@
 package com.recipeapp.service;
 
+import com.recipeapp.model.Category;
 import com.recipeapp.model.Recipe;
 import com.recipeapp.repository.RecipeRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -20,16 +21,16 @@ public class RecipeService {
     }
 
     //filtering
-    public Page<Recipe> searchRecipes(String title, String type, Pageable pageable){
+    public Page<Recipe> searchRecipes(String title, Category category, Pageable pageable){
         boolean hasTitle = title != null && !title.isBlank();
-        boolean hasType = type != null && !type.isBlank();
+        boolean hasCategory = category != null;
 
-        if(hasTitle && hasType){
-            return recipeRepository.findByTitleContainingIgnoreCaseAndTypeContainingIgnoreCase(title, type, pageable);
+        if(hasTitle && hasCategory){
+            return recipeRepository.findByTitleContainingIgnoreCaseAndCategoryContainingIgnoreCase(title, category, pageable);
         } else if(hasTitle){
             return recipeRepository.findByTitleContainingIgnoreCase(title, pageable);
-        }else if(hasType){
-            return recipeRepository.findByTypeContainingIgnoreCase(type, pageable);
+        }else if(hasCategory){
+            return recipeRepository.findByCategoryContainingIgnoreCase(category, pageable);
         }else{
             return recipeRepository.findAll(pageable);
         }

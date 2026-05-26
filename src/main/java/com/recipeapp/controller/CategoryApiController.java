@@ -1,8 +1,9 @@
 package com.recipeapp.controller;
 
 import com.recipeapp.model.Category;
-import com.recipeapp.model.Recipe;
-import com.recipeapp.service.RecipeService;
+import com.recipeapp.model.Ingredient;
+import com.recipeapp.repository.CategoryRepository;
+import com.recipeapp.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,20 +13,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/api/categories")
 @RequiredArgsConstructor
-@RequestMapping("/api/recipes")
-public class RecipeApiController {
-    // dependency injection
-    private final RecipeService recipeService;
+public class CategoryApiController {
+    private final CategoryService categoryService;
 
     //getAll
     @GetMapping
-    public ResponseEntity<Page<Recipe>> getAll(
-            @RequestParam(defaultValue = "") String title,
-            @RequestParam(defaultValue = "") Category category,
+    public ResponseEntity<Page<Category>> getAll(
+            @RequestParam(defaultValue = "") String name,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "title") String sortBy,
+            @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "asc") String direction){
 
         Sort sort = direction.equalsIgnoreCase("desc")
@@ -34,34 +33,33 @@ public class RecipeApiController {
 
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        return ResponseEntity.ok(recipeService.searchRecipes(title, category, pageable));
+        return ResponseEntity.ok(categoryService.searchCategories(name, pageable));
     }
-
 
     //getById
     @GetMapping("/{id}")
-    public ResponseEntity<Recipe> getById(@PathVariable Long id){
-        return ResponseEntity.ok(recipeService.getRecipeById(id));
+    public ResponseEntity<Category> getById(@PathVariable Long id){
+        return ResponseEntity.ok(categoryService.getCategoryById(id));
     }
-
 
     //create
     @PostMapping
-    public ResponseEntity<Recipe> create(@RequestBody Recipe recipe){
-        return ResponseEntity.ok(recipeService.saveRecipe(recipe));
+
+    public ResponseEntity<Category> create(@RequestBody Category category){
+        return ResponseEntity.ok(categoryService.saveCategory(category));
     }
 
     //update
-    @PutMapping("/{id}")
-    public ResponseEntity<Recipe> update(@PathVariable Long id, @RequestBody Recipe recipe){
-        recipe.setId(id);
-        return ResponseEntity.ok(recipeService.saveRecipe(recipe));
+    @PostMapping("/{id}")
+    public ResponseEntity<Category> update(@PathVariable Long id, @RequestBody Category category){
+        category.setId(id);
+        return ResponseEntity.ok(categoryService.saveCategory(category));
     }
 
     //delete
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id){
-        recipeService.deleteRecipe(id);
+        categoryService.deleteCategory(id);
         return ResponseEntity.noContent().build();
     }
 }
