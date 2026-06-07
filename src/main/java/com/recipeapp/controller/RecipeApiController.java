@@ -22,7 +22,7 @@ public class RecipeApiController {
     @GetMapping
     public ResponseEntity<Page<Recipe>> getAll(
             @RequestParam(defaultValue = "") String title,
-            @RequestParam(defaultValue = "") Category category,
+            @RequestParam(defaultValue = "") String categoryName,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "title") String sortBy,
@@ -34,7 +34,7 @@ public class RecipeApiController {
 
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        return ResponseEntity.ok(recipeService.searchRecipes(title, category, pageable));
+        return ResponseEntity.ok(recipeService.searchRecipes(title, categoryName, pageable));
     }
 
 

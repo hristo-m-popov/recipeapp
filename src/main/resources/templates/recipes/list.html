@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Recipes - Recipe Logger</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/">🍽️ Recipe Logger</a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="/">Home</a>
+            <a class="nav-link active" href="/recipes">All Recipes</a>
+            <a class="nav-link" href="/recipes/new">Add Recipe</a>
+            <a class="nav-link" href="/ingredients">Ingredients</a>
+            <a class="nav-link" href="/categories">Categories</a>
+            <a class="nav-link" href="/shopping">Shopping List</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>All Recipes</h2>
+        <a href="/recipes/new" class="btn btn-dark">+ Add Recipe</a>
+    </div>
+
+    <form method="get" action="/recipes" class="row g-2 mb-4">
+        <div class="col-md-3">
+            <input type="text" name="title" class="form-control"
+                   placeholder="Search by title..." th:value="${title}">
+        </div>
+        <div class="col-md-3">
+            <input type="text" name="categoryName" class="form-control"
+                   placeholder="Search by category..." th:value="${categoryName}">
+        </div>
+        <div class="col-md-2">
+            <select name="sortBy" class="form-select">
+                <option value="title" th:selected="${sortBy == 'title'}">Title</option>
+                <option value="rating" th:selected="${sortBy == 'rating'}">Rating</option>
+                <option value="portions" th:selected="${sortBy == 'portions'}">Portions</option>
+                <option value="price" th:selected="${sortBy == 'price'}">Price</option>
+            </select>
+        </div>
+        <div class="col-md-1">
+            <select name="direction" class="form-select">
+                <option value="asc" th:selected="${direction == 'asc'}">↑</option>
+                <option value="desc" th:selected="${direction == 'desc'}">↓</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-dark w-100">Search</button>
+        </div>
+    </form>
+
+    <div class="row g-3">
+        <div th:each="recipe : ${recipes.content}" class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <h5 class="card-title" th:text="${recipe.title}"></h5>
+                        <span th:if="${recipe.favorite}" class="text-warning">⭐</span>
+                    </div>
+                    <p class="text-muted small mb-2"
+                       th:text="${recipe.category != null} ? ${recipe.category.name} : ''"></p>
+                    <p class="card-text small" th:text="${recipe.description}"></p>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <span class="badge bg-dark"
+                              th:text="${recipe.rating != null} ? ${recipe.rating} + '/10' : 'Unrated'"></span>
+                        <span class="text-muted small"
+                              th:text="${recipe.portions != null} ? ${recipe.portions} + ' portions' : ''"></span>
+                    </div>
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                    <a th:href="@{/recipes/{id}(id=${recipe.id})}"
+                       class="btn btn-sm btn-dark">View</a>
+                    <div>
+                        <a th:href="@{/recipes/{id}/edit(id=${recipe.id})}"
+                           class="btn btn-sm btn-outline-dark me-1">Edit</a>
+                        <a th:href="@{/recipes/{id}/delete(id=${recipe.id})}"
+                           class="btn btn-sm btn-danger"
+                           onclick="return confirm('Delete this recipe?')">Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${recipes.content.empty}" class="col-12">
+            <p class="text-center text-muted mt-4">No recipes found. <a href="/recipes/new">Add one!</a></p>
+        </div>
+    </div>
+
+    <nav th:if="${recipes.totalPages > 1}" class="mt-4">
+        <ul class="pagination">
+            <li class="page-item" th:classappend="${recipes.first} ? 'disabled'">
+                <a class="page-link" th:href="@{/recipes(page=${recipes.number - 1},
+                   title=${title}, categoryName=${categoryName},
+                   sortBy=${sortBy}, direction=${direction})}">Previous</a>
+            </li>
+            <li class="page-item"
+                th:each="i : ${#numbers.sequence(0, recipes.totalPages - 1)}"
+                th:classappend="${i == recipes.number} ? 'active'">
+                <a class="page-link" th:href="@{/recipes(page=${i},
+                   title=${title}, categoryName=${categoryName},
+                   sortBy=${sortBy}, direction=${direction})}"
+                   th:text="${i + 1}"></a>
+            </li>
+            <li class="page-item" th:classappend="${recipes.last} ? 'disabled'">
+                <a class="page-link" th:href="@{/recipes(page=${recipes.number + 1},
+                   title=${title}, categoryName=${categoryName},
+                   sortBy=${sortBy}, direction=${direction})}">Next</a>
+            </li>
+        </ul>
+    </nav>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -50,7 +50,7 @@ public class CategoryApiController {
     }
 
     //update
-    @PostMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Category> update(@PathVariable Long id, @RequestBody Category category){
         category.setId(id);
         return ResponseEntity.ok(categoryService.saveCategory(category));

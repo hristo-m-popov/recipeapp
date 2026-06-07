@@ -2,8 +2,10 @@ package com.recipeapp.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 @Entity
 @Table(name = "recipe_ingredient")
 public class RecipeIngredient {

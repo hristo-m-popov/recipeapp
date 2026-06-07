@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${recipe.title}">Recipe</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/">🍽️ Recipe Logger</a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="/">Home</a>
+            <a class="nav-link" href="/recipes">All Recipes</a>
+            <a class="nav-link" href="/recipes/new">Add Recipe</a>
+            <a class="nav-link" href="/ingredients">Ingredients</a>
+            <a class="nav-link" href="/categories">Categories</a>
+            <a class="nav-link" href="/shopping">Shopping List</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0" th:text="${recipe.title}"></h4>
+                    <div>
+                        <a th:href="@{/recipes/{id}/edit(id=${recipe.id})}"
+                           class="btn btn-sm btn-outline-light me-2">Edit</a>
+                        <a th:href="@{/recipes/{id}/delete(id=${recipe.id})}"
+                           class="btn btn-sm btn-danger"
+                           onclick="return confirm('Delete this recipe?')">Delete</a>
+                    </div>
+                </div>
+                <div class="card-body">
+
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <span class="text-muted">Type</span>
+                            <p class="fw-bold" th:text="${recipe.type}"></p>
+                        </div>
+                        <div class="col-md-3">
+                            <span class="text-muted">Category</span>
+                            <p class="fw-bold" th:text="${recipe.category != null} ? ${recipe.category.name} : 'None'"></p>
+                        </div>
+                        <div class="col-md-3">
+                            <span class="text-muted">Portions</span>
+                            <p class="fw-bold" th:text="${recipe.portions}"></p>
+                        </div>
+                        <div class="col-md-3">
+                            <span class="text-muted">Price</span>
+                            <p class="fw-bold" th:text="${recipe.price != null} ? '$' + ${recipe.price} : 'N/A'"></p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <span class="text-muted">Rating</span>
+                            <p class="fw-bold" th:text="${recipe.rating != null} ? ${recipe.rating} + '/10' : 'Not rated'"></p>
+                        </div>
+                        <div class="col-md-3">
+                            <span class="text-muted">Favourite</span>
+                            <p>
+                                <span th:if="${recipe.favorite}" class="badge bg-warning text-dark">⭐ Yes</span>
+                                <span th:unless="${recipe.favorite}" class="badge bg-secondary">No</span>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="text-muted">Added on</span>
+                            <p class="fw-bold" th:text="${recipe.createdAt}"></p>
+                        </div>
+                    </div>
+
+                    <div th:if="${recipe.description}" class="mb-3">
+                        <span class="text-muted">Description</span>
+                        <p th:text="${recipe.description}"></p>
+                    </div>
+
+                    <div class="mb-3">
+                        <span class="text-muted">Steps</span>
+                        <p th:text="${recipe.steps}"></p>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Ingredients</h5>
+                    <button class="btn btn-sm btn-outline-light"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#addIngredientForm">
+                        + Add Ingredient
+                    </button>
+                </div>
+
+                <div class="collapse p-3 border-bottom" id="addIngredientForm">
+                    <form method="post" th:action="@{/recipes/{id}/ingredients/add(id=${recipe.id})}">
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <select name="ingredientId" class="form-select" required>
+                                    <option value="">-- Select Ingredient --</option>
+                                    <option th:each="ingredient : ${allIngredients}"
+                                            th:value="${ingredient.id}"
+                                            th:text="${ingredient.name}">
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="number" name="quantity" class="form-control"
+                                       placeholder="Quantity" min="0" step="0.1">
+                            </div>
+                            <div class="col-md-3">
+                                <input type="text" name="unit" class="form-control"
+                                       placeholder="Unit (grams, cups...)">
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-dark w-100">Add</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Ingredient</th>
+                            <th>Type</th>
+                            <th>Quantity</th>
+                            <th>Unit</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="ri : ${recipeIngredients}">
+                            <td th:text="${ri.ingredient.name}"></td>
+                            <td th:text="${ri.ingredient.type}"></td>
+                            <td th:text="${ri.quantity}"></td>
+                            <td th:text="${ri.unit}"></td>
+                            <td>
+                                <a th:href="@{/recipes/{recipeId}/ingredients/{riId}/delete(recipeId=${recipe.id}, riId=${ri.id})}"
+                                   class="btn btn-sm btn-danger"
+                                   onclick="return confirm('Remove this ingredient?')">Remove</a>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(recipeIngredients)}">
+                            <td colspan="5" class="text-center text-muted">No ingredients added yet</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <a href="/recipes" class="btn btn-outline-dark">← Back to Recipes</a>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

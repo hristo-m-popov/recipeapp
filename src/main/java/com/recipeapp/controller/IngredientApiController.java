@@ -48,7 +48,7 @@ public class IngredientApiController {
     }
 
     //update
-    @PostMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Ingredient> update(@PathVariable Long id, @RequestBody Ingredient ingredient){
         ingredient.setId(id);
         return ResponseEntity.ok(ingredientService.saveIngredient(ingredient));

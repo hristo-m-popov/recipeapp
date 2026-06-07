@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Shopping List - Recipe Logger</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/">🍽️ Recipe Logger</a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="/">Home</a>
+            <a class="nav-link" href="/recipes">All Recipes</a>
+            <a class="nav-link" href="/recipes/new">Add Recipe</a>
+            <a class="nav-link" href="/ingredients">Ingredients</a>
+            <a class="nav-link" href="/categories">Categories</a>
+            <a class="nav-link active" href="/shopping">Shopping List</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>🛒 Shopping List</h2>
+        <a href="/shopping/new" class="btn btn-dark">+ Add Item</a>
+    </div>
+
+    <form method="get" action="/shopping" class="row g-2 mb-4">
+        <div class="col-md-4">
+            <select name="purchased" class="form-select">
+                <option value="">-- All Items --</option>
+                <option value="false" th:selected="${purchased == false}">Not Purchased</option>
+                <option value="true" th:selected="${purchased == true}">Purchased</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-dark w-100">Filter</button>
+        </div>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover bg-white">
+            <thead class="table-dark">
+            <tr>
+                <th>Ingredient</th>
+                <th>Quantity</th>
+                <th>Unit</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${items.content}">
+                <td th:text="${item.ingredient.name}"></td>
+                <td th:text="${item.quantity}"></td>
+                <td th:text="${item.unit}"></td>
+                <td>
+                        <span th:if="${item.purchased}"
+                              class="badge bg-success">✓ Purchased</span>
+                    <span th:unless="${item.purchased}"
+                          class="badge bg-warning text-dark">Pending</span>
+                </td>
+                <td>
+                    <a th:if="${!item.purchased}"
+                       th:href="@{/shopping/{id}/purchased(id=${item.id})}"
+                       class="btn btn-sm btn-success">✓</a>
+                    <a th:href="@{/shopping/{id}/edit(id=${item.id})}"
+                       class="btn btn-sm btn-outline-dark">Edit</a>
+                    <a th:href="@{/shopping/{id}/delete(id=${item.id})}"
+                       class="btn btn-sm btn-danger"
+                       onclick="return confirm('Delete this item?')">Delete</a>
+                </td>
+            </tr>
+            <tr th:if="${items.content.empty}">
+                <td colspan="5" class="text-center text-muted">No items found.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
